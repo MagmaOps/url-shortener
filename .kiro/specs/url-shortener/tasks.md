@@ -55,14 +55,14 @@ Incremental implementation of a FastAPI + PostgreSQL URL shortener. Tasks follow
     - Test `increment_clicks` increments the counter atomically (issue N concurrent calls, assert final count == N)
     - _Requirements: 2.2, 11.1_
 
-- [ ] 4. Service layer
-  - [ ] 4.1 Implement `app/schemas.py`
+- [x] 4. Service layer
+  - [x] 4.1 Implement `app/schemas.py`
     - Define `URLCreateRequest(BaseModel)` with `url: AnyHttpUrl`
     - Define `URLResponse(BaseModel)` with `id`, `short_code`, `url`, `short_url`, `created_at`
     - Define `URLDetailResponse(URLResponse)` adding `clicks: int`
     - _Requirements: 1.1, 3.1_
 
-  - [ ] 4.2 Implement `app/services/url_service.py`
+  - [x] 4.2 Implement `app/services/url_service.py`
     - Implement `URLService.__init__(self, repository: URLRepository, base_url: str)`
     - Implement `generate_short_code() -> str`: use `secrets.choice` over the explicit alphabet `string.ascii_letters + string.digits` to produce exactly 8 characters; never use `token_urlsafe` (which may produce padding or non-alphanumeric characters)
     - Implement `async create_short_url(original_url: str) -> URLRecord`: generate a code, attempt INSERT via repository; on unique-constraint violation retry up to 10 times; raise an internal error after 10 failed attempts

@@ -21,19 +21,19 @@ Incremental implementation of a FastAPI + PostgreSQL URL shortener. Tasks follow
     - Raise a clear startup error when `DATABASE_URL` or `BASE_URL` are missing
     - _Requirements: 7.1, 7.2_
 
-- [ ] 2. Database layer — models, schema, and migrations
-  - [ ] 2.1 Implement `app/database.py`
+- [x] 2. Database layer — models, schema, and migrations
+  - [x] 2.1 Implement `app/database.py`
     - Create async SQLAlchemy engine from `Settings.database_url` using `create_async_engine`
     - Expose `AsyncSessionLocal` session factory and a FastAPI dependency `get_session()` that yields a session and closes it after the request
     - Implement `dispose_engine()` coroutine for use in the shutdown lifecycle hook
     - _Requirements: 6.1, 6.2_
 
-  - [ ] 2.2 Implement `app/models.py`
+  - [x] 2.2 Implement `app/models.py`
     - Define `metadata` and `urls_table` using `sqlalchemy.Table` with columns: `id` (BigInteger PK autoincrement), `short_code` (String(8) NOT NULL UNIQUE), `original_url` (Text NOT NULL), `created_at` (DateTime timezone=True, server_default `func.now()` NOT NULL), `clicks` (BigInteger NOT NULL server_default "0")
     - Define `URLRecord` dataclass with fields matching the table
     - _Requirements: 6.1_
 
-  - [ ] 2.3 Create Alembic migration `alembic/versions/0001_initial_schema.py`
+  - [x] 2.3 Create Alembic migration `alembic/versions/0001_initial_schema.py`
     - Initialize Alembic configuration (`alembic.ini`, `alembic/env.py`) pointing at `Settings.database_url`
     - Write `upgrade()` that issues the `CREATE TABLE urls` DDL matching the schema in Requirement 6.1
     - Write `downgrade()` that drops the `urls` table

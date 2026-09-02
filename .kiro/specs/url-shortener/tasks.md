@@ -40,8 +40,8 @@ Incremental implementation of a FastAPI + PostgreSQL URL shortener. Tasks follow
     - Do NOT call `Base.metadata.create_all()` anywhere in application code
     - _Requirements: 6.1, 6.2, 6.3_
 
-- [ ] 3. Repository layer
-  - [ ] 3.1 Implement `app/repositories/url_repository.py`
+- [x] 3. Repository layer
+  - [x] 3.1 Implement `app/repositories/url_repository.py`
     - Implement `URLRepository.__init__(self, session: AsyncSession)`
     - Implement `async create(short_code, original_url) -> URLRecord` — INSERT and return full row
     - Implement `async get_by_short_code(short_code) -> URLRecord | None` — SELECT by short_code

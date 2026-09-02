@@ -8,14 +8,14 @@ Incremental implementation of a FastAPI + PostgreSQL URL shortener. Tasks follow
 
 ## Tasks
 
-- [ ] 1. Project scaffolding and configuration
-  - [ ] 1.1 Create directory structure and stub files
+- [x] 1. Project scaffolding and configuration
+  - [x] 1.1 Create directory structure and stub files
     - Create `app/`, `app/middleware/`, `app/routes/`, `app/services/`, `app/repositories/`, `tests/`, `tests/properties/`, `alembic/versions/` directories with empty `__init__.py` files as needed
     - Add `requirements.txt` (or `pyproject.toml`) pinning: `fastapi`, `uvicorn[standard]`, `sqlalchemy[asyncio]`, `asyncpg`, `alembic`, `pydantic-settings`, `prometheus-client`, `python-dotenv`; dev deps: `pytest`, `pytest-asyncio`, `httpx`, `hypothesis`
     - Add `.env.example` listing `DATABASE_URL`, `BASE_URL`, `LOG_LEVEL` with example values; add `.env` to `.gitignore`
     - _Requirements: 7.1, 7.3_
 
-  - [ ] 1.2 Implement `app/config.py`
+  - [x] 1.2 Implement `app/config.py`
     - Define `Settings(BaseSettings)` with fields `database_url: str`, `base_url: str`, `log_level: str = "INFO"` using `SettingsConfigDict(env_file=".env", extra="ignore")`
     - Expose a module-level `get_settings()` cached function
     - Raise a clear startup error when `DATABASE_URL` or `BASE_URL` are missing

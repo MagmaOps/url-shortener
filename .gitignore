@@ -78,3 +78,9 @@ logs/
 # =========================
 
 docker-compose.override.yml
+
+# =========================
+# Kiro local metadata/state
+# =========================
+
+tasks.meta.json

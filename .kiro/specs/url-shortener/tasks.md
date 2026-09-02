@@ -78,18 +78,18 @@ Incremental implementation of a FastAPI + PostgreSQL URL shortener. Tasks follow
     - Test that after 10 consecutive collision failures an internal error is raised
     - _Requirements: 1.2, 1.3_
 
-- [ ] 5. HTTP routes
-  - [ ] 5.1 Implement `app/routes/health.py`
+- [x] 5. HTTP routes
+  - [x] 5.1 Implement `app/routes/health.py`
     - `GET /health` — returns `{"status": "ok"}` with HTTP 200; no DB call
     - `GET /ready` — attempts a lightweight DB query; returns `{"status": "ready"}` / 200 on success, `{"status": "not_ready"}` / 503 on failure
     - _Requirements: 4.1, 4.2, 4.3_
 
-  - [ ] 5.2 Implement `app/routes/urls.py`
+  - [x] 5.2 Implement `app/routes/urls.py`
     - `POST /api/urls` — accepts `URLCreateRequest`, calls `URLService.create_short_url`, returns `URLResponse` with HTTP 201
     - `GET /api/urls/{short_code}` — calls `URLRepository.get_by_short_code`; returns `URLDetailResponse` / 200 if found, `{"detail": "Short URL not found"}` / 404 if not
     - _Requirements: 1.1, 1.4, 1.5, 3.1, 3.2_
 
-  - [ ] 5.3 Implement `app/routes/redirect.py`
+  - [x] 5.3 Implement `app/routes/redirect.py`
     - `GET /{short_code}` — calls `URLRepository.get_by_short_code`; if found, calls `URLRepository.increment_clicks` to atomically increments the click counter and then returns HTTP 302 with `Location` header set to `original_url`. If the click counter update fails, the request SHALL fail with an appropriate 5xx response rather than returning a successful redirect without recording the click; if not found returns `{"detail": "Short URL not found"}` / 404
     - _Requirements: 2.1, 2.2, 2.3_
 

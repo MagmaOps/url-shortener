@@ -49,7 +49,7 @@ Incremental implementation of a FastAPI + PostgreSQL URL shortener. Tasks follow
     - Raise domain-level exceptions (not raw SQLAlchemy errors) for caller handling
     - _Requirements: 2.2, 6.1_
 
-  - [ ]* 3.2 Write unit tests for `URLRepository`
+  - [x] 3.2 Write unit tests for `URLRepository`
     - Test `create` inserts a row and returns a `URLRecord` with all fields populated
     - Test `get_by_short_code` returns `None` for a missing code
     - Test `increment_clicks` increments the counter atomically (issue N concurrent calls, assert final count == N)
@@ -68,12 +68,12 @@ Incremental implementation of a FastAPI + PostgreSQL URL shortener. Tasks follow
     - Implement `async create_short_url(original_url: str) -> URLRecord`: generate a code, attempt INSERT via repository; on unique-constraint violation retry up to 10 times; raise an internal error after 10 failed attempts
     - _Requirements: 1.2, 1.3_
 
-  - [ ]* 4.3 Write property test for short code format (Property 1)
+  - [x] 4.3 Write property test for short code format (Property 1)
     - **Property 1: Short Code Format Invariant**
     - Generate arbitrary calls to `generate_short_code()` via Hypothesis; assert `len(code) == 8` and `re.fullmatch(r'[A-Za-z0-9]{8}', code)` holds for every generated example
     - **Validates: Requirements 1.2**
 
-  - [ ]* 4.4 Write unit tests for `URLService`
+  - [x] 4.4 Write unit tests for `URLService`
     - Test that `create_short_url` retries on unique-constraint violation and returns a code not in the pre-existing set (validates Property 2)
     - Test that after 10 consecutive collision failures an internal error is raised
     - _Requirements: 1.2, 1.3_
@@ -93,35 +93,35 @@ Incremental implementation of a FastAPI + PostgreSQL URL shortener. Tasks follow
     - `GET /{short_code}` — calls `URLRepository.get_by_short_code`; if found, calls `URLRepository.increment_clicks` to atomically increments the click counter and then returns HTTP 302 with `Location` header set to `original_url`. If the click counter update fails, the request SHALL fail with an appropriate 5xx response rather than returning a successful redirect without recording the click; if not found returns `{"detail": "Short URL not found"}` / 404
     - _Requirements: 2.1, 2.2, 2.3_
 
-  - [ ]* 5.4 Write integration tests for health and readiness endpoints
+  - [x] 5.4 Write integration tests for health and readiness endpoints
     - Test `GET /health` → 200 `{"status": "ok"}`
     - Test `GET /ready` with DB available → 200 `{"status": "ready"}`
     - Test `GET /ready` with DB unavailable → 503 `{"status": "not_ready"}`
     - _Requirements: 4.1, 4.2, 4.3, 11.1_
 
-  - [ ]* 5.5 Write integration tests for URL creation endpoint
+  - [x] 5.5 Write integration tests for URL creation endpoint
     - Test `POST /api/urls` with valid HTTPS URL → 201, all response fields present, `short_url` equals `BASE_URL + "/" + short_code`
     - Test `POST /api/urls` with `ftp://bad` → 422
     - Test `POST /api/urls` with empty body → 422
     - _Requirements: 1.1, 1.4, 1.5, 9.2, 11.1_
 
-  - [ ]* 5.6 Write property test for input validation (Property 4)
+  - [x] 5.6 Write property test for input validation (Property 4)
     - **Property 4: Input Validation Rejects Non-HTTP/HTTPS URLs**
     - Use Hypothesis to generate strings with non-http/https schemes and arbitrary non-URL strings; assert every submission to `POST /api/urls` returns 422
     - **Validates: Requirements 1.4, 1.5**
 
-  - [ ]* 5.7 Write integration tests for redirect endpoint
+  - [x] 5.7 Write integration tests for redirect endpoint
     - Test `GET /{short_code}` → 302 with correct `Location` header
     - Test `GET /{short_code}` increments click count by 1 per access (issue N requests, assert `clicks == N`)
     - Test `GET /nonexistent` → 404 `{"detail": "Short URL not found"}`
     - _Requirements: 2.1, 2.2, 2.3, 11.1_
 
-  - [ ]* 5.8 Write integration tests for URL lookup endpoint
+  - [x] 5.8 Write integration tests for URL lookup endpoint
     - Test `GET /api/urls/{short_code}` → 200 with all required fields (`id`, `short_code`, `url`, `short_url`, `created_at`, `clicks`)
     - Test `GET /api/urls/nonexistent` → 404 `{"detail": "Short URL not found"}`
     - _Requirements: 3.1, 3.2, 11.1_
 
-- [ ] 6. Checkpoint — core routes working
+- [x] 6. Checkpoint — core routes working
   - Ensure all tests pass, ask the user if questions arise.
 
 - [ ] 7. Application wiring and `main.py`

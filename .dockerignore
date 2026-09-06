@@ -1,0 +1,69 @@
+# Git metadata
+.git
+.gitignore
+.gitattributes
+
+# Virtual environments
+.venv
+venv
+env
+ENV
+
+# Python caches / bytecode
+__pycache__
+*.py[cod]
+*$py.class
+
+# Test / coverage / tooling caches
+tests
+.pytest_cache
+.mypy_cache
+.pyright
+.ruff_cache
+.hypothesis
+.coverage
+.coverage.*
+htmlcov
+coverage.xml
+.tox
+.nox
+
+# Packaging / build artifacts
+build
+dist
+*.egg-info
+.eggs
+pip-wheel-metadata
+
+# Environment / secrets — never copy into the image
+.env
+.env.*
+!.env.example
+
+# IDE / editor files
+.idea
+.vscode
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Local development / logs / data
+*.log
+logs
+*.db
+*.sqlite
+*.sqlite3
+docker-compose.override.yml
+
+# Kiro metadata / specs (not needed at runtime)
+.kiro
+tasks.meta.json
+nul
+
+# Docker files themselves
+Dockerfile
+.dockerignore

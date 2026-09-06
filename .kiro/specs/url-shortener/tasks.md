@@ -177,8 +177,8 @@ Incremental implementation of a FastAPI + PostgreSQL URL shortener. Tasks follow
 - [x] 11. Checkpoint — all tests passing
   - Ensure all tests pass, ask the user if questions arise.
 
-- [ ] 12. Containerization
-  - [ ] 12.1 Write `Dockerfile`
+- [x] 12. Containerization
+  - [x] 12.1 Write `Dockerfile`
     - Create a `.dockerignore` that excludes development files, virtual environments, tests, Git metadata, caches, `.env`, and other files not required to run the application.
     - Use `python:3.12-slim` as base image
     - Create a non-root user (e.g. `appuser`) and run the application as that user
@@ -189,7 +189,7 @@ Incremental implementation of a FastAPI + PostgreSQL URL shortener. Tasks follow
     - Do NOT copy `.env` or any file containing secrets into the image
     - _Requirements: 10.1, 10.2, 10.3, 10.4, 10.5, 10.6, 10.7_
 
-  - [ ] 12.2 Write container documentation in `README.md`
+  - [x] 12.2 Write container documentation in `README.md`
     - Document `docker build -t url-shortener:latest .`
     - Document `docker run` with required `-e DATABASE_URL=...` and `-e BASE_URL=...` flags
     - Document how to run Alembic migrations separately from application startup. The application container SHALL NOT automatically run database migrations on every startup.

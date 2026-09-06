@@ -1,11 +1,9 @@
 import asyncio
+import os
 from logging.config import fileConfig
 
 from alembic import context
 from sqlalchemy.ext.asyncio import create_async_engine
-
-# Import application settings to get DATABASE_URL at runtime
-from app.config import get_settings
 
 # Import metadata so Alembic can compare against the current schema (used
 # for autogenerate; harmless when not using autogenerate).
@@ -23,8 +21,19 @@ target_metadata = metadata
 
 
 def get_url() -> str:
-    """Return the database URL from application settings."""
-    return get_settings().database_url
+    """Return the database URL for migrations.
+
+    Migrations only need DATABASE_URL. Read it directly from the environment
+    rather than through the full application Settings object, so running
+    migrations does not require BASE_URL (which is only needed to serve
+    requests). This keeps migrations decoupled from application-serving config.
+    """
+    url = os.environ.get("DATABASE_URL")
+    if not url:
+        raise RuntimeError(
+            "DATABASE_URL environment variable is required to run migrations"
+        )
+    return url
 
 
 def run_migrations_offline() -> None:

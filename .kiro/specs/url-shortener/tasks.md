@@ -124,15 +124,15 @@ Incremental implementation of a FastAPI + PostgreSQL URL shortener. Tasks follow
 - [x] 6. Checkpoint — core routes working
   - Ensure all tests pass, ask the user if questions arise.
 
-- [ ] 7. Application wiring and `main.py`
-  - [ ] 7.1 Implement `app/main.py` — app factory and lifecycle
+- [x] 7. Application wiring and `main.py`
+  - [x] 7.1 Implement `app/main.py` — app factory and lifecycle
     - Create `FastAPI` application instance, register all routers (`health`, `urls`, `redirect`)
     - Add `lifespan` context manager that initializes application resources on startup and calls `dispose_engine()` on shutdown. Database connectivity SHALL be checked by the `/ready` endpoint rather than being required for application process startup.
     - Register global `Exception` handler that logs the full traceback at ERROR level and returns `{"detail": "Internal server error"}` / 500; increments `url_shortener_errors_total`
     - Wire `get_session` dependency into routes; wire `URLRepository` and `URLService` through FastAPI `Depends`
     - _Requirements: 9.1, 9.2, 10.1_
 
-  - [ ]* 7.2 Write integration test for global exception handler (Property 10)
+  - [x] 7.2 Write integration test for global exception handler (Property 10)
     - **Property 10: Safe Error Responses**
     - Use a mock that raises an unexpected exception in the service layer; assert response is 500 with body exactly `{"detail": "Internal server error"}` and no stack trace or SQL text in body
     - **Validates: Requirements 9.1**

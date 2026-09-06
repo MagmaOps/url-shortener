@@ -15,24 +15,15 @@ from contextlib import asynccontextmanager
 from typing import AsyncGenerator
 
 from fastapi import FastAPI, Request
-from fastapi.responses import JSONResponse
-from prometheus_client import Counter
+from fastapi.responses import JSONResponse, Response
+from prometheus_client import generate_latest
 
 from app.config import get_settings
 from app.database import dispose_engine
+from app.middleware.metrics import MetricsMiddleware, url_shortener_errors_total
 from app.routes import health, redirect, urls
 
 logger = logging.getLogger(__name__)
-
-# ---------------------------------------------------------------------------
-# Prometheus counter for unhandled errors.
-# Defined here so the metrics middleware (task 8.1) can import it rather than
-# creating a duplicate registration.
-# ---------------------------------------------------------------------------
-url_shortener_errors_total = Counter(
-    "url_shortener_errors_total",
-    "Total number of error responses returned by the URL Shortener",
-)
 
 
 # ---------------------------------------------------------------------------
@@ -85,6 +76,33 @@ def create_app() -> FastAPI:
         version="1.0.0",
         lifespan=lifespan,
     )
+
+    # ------------------------------------------------------------------
+    # Middleware
+    # ------------------------------------------------------------------
+    app.add_middleware(MetricsMiddleware)
+
+    # ------------------------------------------------------------------
+    # Prometheus scrape endpoint
+    #
+    # Registered BEFORE the routers so it takes precedence over the
+    # ``GET /{short_code}`` catch-all redirect route (Starlette matches routes
+    # in registration order — the catch-all would otherwise swallow /metrics).
+    # ------------------------------------------------------------------
+
+    @app.get("/metrics", include_in_schema=False)
+    async def metrics() -> Response:
+        """Expose Prometheus metrics in the standard text exposition format.
+
+        Requirements: 5.1, 5.2, 5.3
+        """
+        # Media type is the Prometheus text exposition format. Starlette
+        # appends "; charset=utf-8" for text/* responses, yielding the
+        # canonical "text/plain; version=0.0.4; charset=utf-8".
+        return Response(
+            content=generate_latest(),
+            media_type="text/plain; version=0.0.4",
+        )
 
     # ------------------------------------------------------------------
     # Routers

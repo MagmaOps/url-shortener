@@ -137,8 +137,8 @@ Incremental implementation of a FastAPI + PostgreSQL URL shortener. Tasks follow
     - Use a mock that raises an unexpected exception in the service layer; assert response is 500 with body exactly `{"detail": "Internal server error"}` and no stack trace or SQL text in body
     - **Validates: Requirements 9.1**
 
-- [ ] 8. Metrics middleware
-  - [ ] 8.1 Implement `app/middleware/metrics.py`
+- [x] 8. Metrics middleware
+  - [x] 8.1 Implement `app/middleware/metrics.py`
     - Subclass `BaseHTTPMiddleware`; define module-level Prometheus metrics: `http_requests_total` (Counter, labels: method, path, status), `http_request_duration_seconds` (Histogram, labels: method, path, status), `url_shortener_urls_created_total` (Counter), `url_shortener_redirects_total` (Counter), `url_shortener_errors_total` (Counter)
     - In `dispatch`: record start time, call `await call_next(request)`, record duration; skip incrementing `http_requests_total` and `http_request_duration_seconds` for paths `/metrics`, `/health`, `/ready`
     - HTTP request metrics SHALL use the matched FastAPI/Starlette route template (for example, /api/urls/{short_code}) rather than the raw request path, so individual short codes do not create separate Prometheus time series.
@@ -147,7 +147,7 @@ Incremental implementation of a FastAPI + PostgreSQL URL shortener. Tasks follow
     - Add `GET /metrics` route that returns `generate_latest()` with content-type `text/plain; version=0.0.4`
     - _Requirements: 5.1, 5.2, 5.3, 5.4, 5.5_
 
-  - [ ]* 8.2 Write integration tests for metrics endpoint
+  - [x] 8.2 Write integration tests for metrics endpoint
     - Test `GET /metrics` response includes all five required metric names
     - Test that requests to `/metrics`, `/health`, `/ready` are excluded from `http_requests_total`
     - _Requirements: 5.1, 5.2, 5.3, 5.5, 11.1_

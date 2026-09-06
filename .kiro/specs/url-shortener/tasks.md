@@ -152,15 +152,15 @@ Incremental implementation of a FastAPI + PostgreSQL URL shortener. Tasks follow
     - Test that requests to `/metrics`, `/health`, `/ready` are excluded from `http_requests_total`
     - _Requirements: 5.1, 5.2, 5.3, 5.5, 11.1_
 
-- [ ] 9. Logging middleware
-  - [ ] 9.1 Implement `app/middleware/logging.py`
+- [x] 9. Logging middleware
+  - [x] 9.1 Implement `app/middleware/logging.py`
     - Subclass `BaseHTTPMiddleware`; configure application `logging` to emit structured JSON logs to stdout/stderr. Logging configuration SHALL NOT write application logs to files inside the container; respect `Settings.log_level`
     - In `dispatch`: record start time, call `await call_next(request)`, compute `duration_ms`; emit one structured log entry per request with fields: `timestamp`, `level`, `method`, `path`, `status_code`, `duration_ms`
     - Do NOT log request bodies, `Authorization` headers, query strings containing credentials, or the raw `DATABASE_URL`
     - Register middleware in `app/main.py` (before metrics middleware so logging wraps everything)
     - _Requirements: 8.1, 8.2, 8.3_
 
-  - [ ]* 9.2 Write unit tests for logging middleware (Property 11)
+  - [x] 9.2 Write unit tests for logging middleware (Property 11)
     - **Property 11: Request Log Completeness**
     - Capture log output during test requests; assert every emitted request log entry contains `timestamp`, `level`, `method`, `path`, `status_code`, `duration_ms`
     - Assert no log entry contains `DATABASE_URL` value, passwords, or request body content

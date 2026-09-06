@@ -20,6 +20,7 @@ from prometheus_client import generate_latest
 
 from app.config import get_settings
 from app.database import dispose_engine
+from app.middleware.logging import LoggingMiddleware, configure_logging
 from app.middleware.metrics import MetricsMiddleware, url_shortener_errors_total
 from app.routes import health, redirect, urls
 
@@ -46,10 +47,7 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
         database connections before the process exits.
     """
     settings = get_settings()
-    logging.basicConfig(
-        level=getattr(logging, settings.log_level.upper(), logging.INFO),
-        format="%(asctime)s %(levelname)s %(name)s %(message)s",
-    )
+    configure_logging(settings.log_level)
     logger.info(
         "URL Shortener starting up (base_url=%s, log_level=%s)",
         settings.base_url,
@@ -79,8 +77,15 @@ def create_app() -> FastAPI:
 
     # ------------------------------------------------------------------
     # Middleware
+    #
+    # Starlette runs the most-recently-added middleware outermost, so the
+    # metrics middleware is added first and the logging middleware second —
+    # this makes logging the outermost layer, wrapping the metrics middleware
+    # and everything beneath it so it observes the final status of every
+    # request.
     # ------------------------------------------------------------------
     app.add_middleware(MetricsMiddleware)
+    app.add_middleware(LoggingMiddleware)
 
     # ------------------------------------------------------------------
     # Prometheus scrape endpoint

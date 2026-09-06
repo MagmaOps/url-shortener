@@ -166,15 +166,15 @@ Incremental implementation of a FastAPI + PostgreSQL URL shortener. Tasks follow
     - Assert no log entry contains `DATABASE_URL` value, passwords, or request body content
     - **Validates: Requirements 8.2, 8.3**
 
-- [ ] 10. Test infrastructure (`tests/conftest.py`)
-  - [ ] 10.1 Implement `tests/conftest.py`
+- [x] 10. Test infrastructure (`tests/conftest.py`)
+  - [x] 10.1 Implement `tests/conftest.py`
     - Create async SQLAlchemy engine pointed at a test database URL (read from `TEST_DATABASE_URL` env var or derived from `DATABASE_URL`)
     - Run Alembic migrations against the test database at session start
     - Provide `async_client` fixture: an `httpx.AsyncClient` wrapping the FastAPI app with `base_url="http://test"`
     - Use a dedicated test PostgreSQL database. Tests MAY clean up data between tests using truncation or transaction isolation, but the implementation SHALL prioritize reliable integration tests over a complex transaction-sharing fixture.
     - _Requirements: 11.2_
 
-- [ ] 11. Checkpoint — all tests passing
+- [x] 11. Checkpoint — all tests passing
   - Ensure all tests pass, ask the user if questions arise.
 
 - [ ] 12. Containerization

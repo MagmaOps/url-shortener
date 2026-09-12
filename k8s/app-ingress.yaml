@@ -1,0 +1,48 @@
+# Ingress for the URL Shortener.
+#
+# This exposes the app outside the cluster through the existing ingress-nginx
+# controller (which MetalLB fronts with a LAN IP). The app's own Service stays
+# a plain ClusterIP — only ingress-nginx holds the MetalLB LoadBalancer IP, and
+# this Ingress rule tells nginx to route a hostname to that Service.
+#
+#   client ──► http://url.homelab.local
+#                  │  (DNS/hosts -> MetalLB IP of ingress-nginx)
+#                  ▼
+#            ingress-nginx  ──►  Ingress rule (host below)
+#                  │
+#                  ▼
+#            Service url-shortener :8000  ──►  Pod :8000
+#
+# SETUP NOTES:
+#   * host: change "url.homelab.local" to the hostname you want. It must be
+#     resolvable from wherever you browse — either a hosts-file entry or a
+#     record in your homelab DNS — pointing at the EXTERNAL-IP of the
+#     ingress-nginx controller Service:
+#         kubectl get svc -n ingress-nginx
+#   * ingressClassName: "nginx" is the class ingress-nginx registers by
+#     default. Confirm with:  kubectl get ingressclass
+#   * BASE_URL in app-configmap.yaml must match this host (e.g.
+#     http://url.homelab.local) so the short URLs the app returns are correct.
+#   * TLS is intentionally omitted for now (plain HTTP). To add HTTPS later,
+#     add a `tls:` block and a certificate (self-signed or via cert-manager).
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: url-shortener
+  namespace: url-shortener
+  labels:
+    app.kubernetes.io/name: url-shortener
+    app.kubernetes.io/part-of: url-shortener
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: url.homelab.local
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: url-shortener
+                port:
+                  number: 8000

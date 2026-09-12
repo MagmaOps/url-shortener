@@ -1,0 +1,100 @@
+# PostgreSQL StatefulSet.
+#
+# A single-replica StatefulSet is intentional for this homelab learning
+# project — we want stable network identity and stable per-pod storage, not a
+# highly-available Postgres cluster. Do not scale this beyond 1 replica; that
+# would require replication/HA that is deliberately out of scope here.
+#
+# Persistence is provided by volumeClaimTemplates, which creates one PVC per
+# pod (postgres-data-postgres-0). The data survives pod restarts and
+# rescheduling.
+#
+# The PostgreSQL version (14-alpine) matches the version used in local
+# development / the project README, keeping dev and cluster consistent.
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: postgres
+  namespace: url-shortener
+  labels:
+    app.kubernetes.io/name: postgres
+    app.kubernetes.io/part-of: url-shortener
+spec:
+  serviceName: postgres
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: postgres
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: postgres
+        app.kubernetes.io/part-of: url-shortener
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:14-alpine
+          ports:
+            - name: postgres
+              containerPort: 5432
+          # Database name / user / password all come from the Secret so no
+          # credentials are hardcoded in the workload spec.
+          envFrom:
+            - secretRef:
+                name: postgres-secret
+          # PGDATA points at a subdirectory of the mounted volume. On many
+          # storage backends the volume root contains a lost+found directory,
+          # which makes Postgres refuse to initialize; using a subdirectory
+          # avoids that class of failure.
+          env:
+            - name: PGDATA
+              value: /var/lib/postgresql/data/pgdata
+          volumeMounts:
+            - name: postgres-data
+              mountPath: /var/lib/postgresql/data
+          # Conservative homelab-sized resources. These are starting values to
+          # introduce resource management, NOT production-tuned figures.
+          # Requests = guaranteed/scheduled; limits = hard ceiling.
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "256Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
+          # Liveness/readiness use pg_isready, the standard lightweight probe
+          # for whether Postgres is accepting connections.
+          readinessProbe:
+            exec:
+              command:
+                - /bin/sh
+                - -c
+                - exec pg_isready -U "$POSTGRES_USER" -d "$POSTGRES_DB" -h 127.0.0.1
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 6
+          livenessProbe:
+            exec:
+              command:
+                - /bin/sh
+                - -c
+                - exec pg_isready -U "$POSTGRES_USER" -d "$POSTGRES_DB" -h 127.0.0.1
+            initialDelaySeconds: 30
+            periodSeconds: 15
+            timeoutSeconds: 5
+            failureThreshold: 6
+  # volumeClaimTemplates provisions persistent storage via the cluster's
+  # default StorageClass. 1Gi is plenty for a learning project; adjust to taste.
+  volumeClaimTemplates:
+    - metadata:
+        name: postgres-data
+        labels:
+          app.kubernetes.io/name: postgres
+          app.kubernetes.io/part-of: url-shortener
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 1Gi

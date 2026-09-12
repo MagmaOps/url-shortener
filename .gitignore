@@ -86,3 +86,13 @@ docker-compose.override.yml
 tasks.meta.json
 nul
 .hypothesis/*
+
+# =========================
+# Kubernetes secrets
+# =========================
+# Never commit plaintext Secret manifests or the controller's private key.
+# SealedSecrets (*-sealedsecret.yaml) and k8s/examples/*.example.yaml are safe
+# and intentionally NOT ignored.
+k8s/*-secret.yaml
+homelab-pub-cert.pem
+sealed-secrets-key-backup.yaml

@@ -1,0 +1,78 @@
+# URL Shortener application Deployment.
+#
+# The app is stateless, so a Deployment (not a StatefulSet) is the right
+# workload. Starts at replicas: 1 — scaling is a later learning step.
+#
+# Configuration is injected entirely from the ConfigMap (non-sensitive) and the
+# Secret (DATABASE_URL). Nothing is hardcoded in the pod spec.
+#
+# NOTE: this Deployment does NOT run migrations. Migrations are handled
+# separately by migration-job.yaml (alembic upgrade head). The container's
+# default command (uvicorn) is used unchanged.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: url-shortener
+  namespace: url-shortener
+  labels:
+    app.kubernetes.io/name: url-shortener
+    app.kubernetes.io/part-of: url-shortener
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: url-shortener
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: url-shortener
+        app.kubernetes.io/part-of: url-shortener
+      annotations:
+        # Hints for a Prometheus scraper that honours pod annotations. The app
+        # exposes metrics at /metrics on the app port. Harmless if unused.
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8000"
+        prometheus.io/path: "/metrics"
+    spec:
+      containers:
+        - name: url-shortener
+          image: magmakomer/url-shortener:1.0.0
+          ports:
+            - name: http
+              containerPort: 8000
+          # LOG_LEVEL + BASE_URL from the ConfigMap; DATABASE_URL from the Secret.
+          envFrom:
+            - configMapRef:
+                name: app-config
+            - secretRef:
+                name: app-secret
+          # Probes use the app's existing endpoints (no new endpoint was added):
+          #   /health -> liveness; returns 200 without touching the DB.
+          #   /ready  -> readiness; runs SELECT 1, returns 503 if the DB is down.
+          # This keeps the pod out of the Service endpoints until the DB is
+          # reachable, without restarting the pod when the DB blips.
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 15
+            timeoutSeconds: 3
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 3
+          # Conservative homelab resource envelope — introduces resource
+          # management; not production-tuned.
+          resources:
+            requests:
+              cpu: "50m"
+              memory: "128Mi"
+            limits:
+              cpu: "250m"
+              memory: "256Mi"

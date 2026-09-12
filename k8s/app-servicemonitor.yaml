@@ -1,0 +1,31 @@
+# ServiceMonitor — tells the Prometheus Operator (kube-prometheus-stack) to
+# scrape this app's /metrics endpoint.
+#
+# The cluster's Prometheus is configured with
+# serviceMonitorSelectorNilUsesHelmValues: false, so it discovers
+# ServiceMonitors in ANY namespace — no extra label wiring needed. (Note: the
+# pod's prometheus.io/scrape annotations are ignored by this Operator-based
+# setup; the ServiceMonitor is what actually enables scraping.)
+#
+# It targets the url-shortener Service by label and scrapes its named "http"
+# port at path /metrics, which the app exposes in Prometheus text format.
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: url-shortener
+  namespace: url-shortener
+  labels:
+    app.kubernetes.io/name: url-shortener
+    app.kubernetes.io/part-of: url-shortener
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: url-shortener
+  namespaceSelector:
+    matchNames:
+      - url-shortener
+  endpoints:
+    - port: http          # matches the Service port named "http" (8000)
+      path: /metrics
+      interval: 15s
+      scheme: http

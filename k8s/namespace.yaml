@@ -1,9 +1,0 @@
-# Namespace that isolates all URL Shortener resources.
-# Every other manifest in this directory targets this namespace so the whole
-# stack can be applied, inspected, and torn down as a single logical unit.
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: url-shortener
-  labels:
-    app.kubernetes.io/part-of: url-shortener

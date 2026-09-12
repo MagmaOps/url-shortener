@@ -16,5 +16,5 @@ metadata:
     app.kubernetes.io/name: url-shortener
     app.kubernetes.io/part-of: url-shortener
 data:
-  BASE_URL: "http://url.homelab.local"
+  BASE_URL: "http://url.lab.local"
   LOG_LEVEL: "INFO"

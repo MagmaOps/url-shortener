@@ -5,7 +5,7 @@
 # a plain ClusterIP — only ingress-nginx holds the MetalLB LoadBalancer IP, and
 # this Ingress rule tells nginx to route a hostname to that Service.
 #
-#   client ──► http://url.homelab.local
+#   client ──► http://url.lab.local
 #                  │  (DNS/hosts -> MetalLB IP of ingress-nginx)
 #                  ▼
 #            ingress-nginx  ──►  Ingress rule (host below)
@@ -14,7 +14,7 @@
 #            Service url-shortener :8000  ──►  Pod :8000
 #
 # SETUP NOTES:
-#   * host: change "url.homelab.local" to the hostname you want. It must be
+#   * host: change "url.lab.local" to the hostname you want. It must be
 #     resolvable from wherever you browse — either a hosts-file entry or a
 #     record in your homelab DNS — pointing at the EXTERNAL-IP of the
 #     ingress-nginx controller Service:
@@ -22,7 +22,7 @@
 #   * ingressClassName: "nginx" is the class ingress-nginx registers by
 #     default. Confirm with:  kubectl get ingressclass
 #   * BASE_URL in app-configmap.yaml must match this host (e.g.
-#     http://url.homelab.local) so the short URLs the app returns are correct.
+#     http://url.lab.local) so the short URLs the app returns are correct.
 #   * TLS is intentionally omitted for now (plain HTTP). To add HTTPS later,
 #     add a `tls:` block and a certificate (self-signed or via cert-manager).
 apiVersion: networking.k8s.io/v1
@@ -36,7 +36,7 @@ metadata:
 spec:
   ingressClassName: nginx
   rules:
-    - host: url.homelab.local
+    - host: url.lab.local
       http:
         paths:
           - path: /

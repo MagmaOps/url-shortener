@@ -31,4 +31,3 @@ resources:
   - migration-job.yaml
   # Observability
   - app-servicemonitor.yaml
-  - app-grafana-dashboard.yaml

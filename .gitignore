@@ -96,3 +96,11 @@ nul
 k8s/*-secret.yaml
 homelab-pub-cert.pem
 sealed-secrets-key-backup.yaml
+
+# Test files
+loadtester
+tmp
+
+# Dashboards
+dashboards
+k8s/base/app-grafana-dashboard.yaml

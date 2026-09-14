@@ -67,3 +67,11 @@ nul
 # Docker files themselves
 Dockerfile
 .dockerignore
+
+# Test files
+loadtester
+tmp
+
+# Dashboards
+dashboards
+k8s/base/app-grafana-dashboard.yaml

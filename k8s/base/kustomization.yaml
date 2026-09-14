@@ -1,0 +1,34 @@
+# Base Kustomization for the URL Shortener.
+#
+# This bundles all the environment-agnostic manifests into a reusable base.
+# It intentionally contains NO environment-specific tuning (resource sizing,
+# replica counts, ingress host, config values). Those are layered on top by an
+# overlay that lives in the cluster GitOps repo (k3s-lab), which references
+# this base as a remote Kustomize resource and patches it.
+#
+# So: this repo publishes a stable base; the cluster git customizes it.
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+# All resources live in this namespace. Declaring it here makes it the single
+# source of truth; the per-file `namespace:` fields stay in sync with it.
+namespace: url-shortener
+
+resources:
+  # Config + secrets
+  - app-configmap.yaml
+  - app-sealedsecret.yaml
+  - postgres-sealedsecret.yaml
+  # Data tier
+  - postgres-statefulset.yaml
+  - postgres-service.yaml
+  # Application tier
+  - app-deployment.yaml
+  - app-service.yaml
+  - app-ingress.yaml
+  # Schema migrations (run as a Job; add ArgoCD PreSync hook annotations in
+  # the cluster git overlay, not here)
+  - migration-job.yaml
+  # Observability
+  - app-servicemonitor.yaml
+  - app-grafana-dashboard.yaml

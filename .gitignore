@@ -103,4 +103,3 @@ tmp
 
 # Dashboards
 dashboards
-k8s/base/app-grafana-dashboard.yaml

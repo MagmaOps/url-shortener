@@ -1,0 +1,258 @@
+# Grafana dashboard delivered as a ConfigMap.
+#
+# The cluster's Grafana runs the dashboard sidecar with:
+#   sidecar.dashboards.enabled: true
+#   label: grafana_dashboard
+#   searchNamespace: ALL
+# so ANY ConfigMap in ANY namespace carrying the label
+# "grafana_dashboard: \"1\"" is auto-imported as a dashboard. No Grafana
+# restart or manual import needed once this is applied.
+#
+# The embedded JSON is identical to dashboards/url-shortener-dashboard.json
+# (which you can also import manually via the Grafana UI for quick testing).
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: url-shortener-dashboard
+  namespace: url-shortener
+  labels:
+    grafana_dashboard: "1"
+    app.kubernetes.io/name: url-shortener
+    app.kubernetes.io/part-of: url-shortener
+data:
+  url-shortener-dashboard.json: |
+    {
+      "annotations": {
+        "list": [
+          {
+            "builtIn": 1,
+            "datasource": { "type": "grafana", "uid": "-- Grafana --" },
+            "enable": true,
+            "hide": true,
+            "iconColor": "rgba(0, 211, 255, 1)",
+            "name": "Annotations & Alerts",
+            "type": "dashboard"
+          }
+        ]
+      },
+      "editable": true,
+      "fiscalYearStartMonth": 0,
+      "graphTooltip": 1,
+      "links": [],
+      "liveNow": false,
+      "refresh": "30s",
+      "schemaVersion": 39,
+      "tags": ["url-shortener", "application"],
+      "templating": {
+        "list": [
+          {
+            "current": {},
+            "hide": 0,
+            "includeAll": false,
+            "label": "Data source",
+            "multi": false,
+            "name": "datasource",
+            "options": [],
+            "query": "prometheus",
+            "refresh": 1,
+            "regex": "",
+            "skipUrlSync": false,
+            "type": "datasource"
+          }
+        ]
+      },
+      "time": { "from": "now-1h", "to": "now" },
+      "timepicker": {},
+      "timezone": "",
+      "title": "URL Shortener",
+      "uid": "url-shortener-app",
+      "version": 1,
+      "panels": [
+        {
+          "type": "row",
+          "title": "Overview",
+          "gridPos": { "h": 1, "w": 24, "x": 0, "y": 0 },
+          "id": 100,
+          "collapsed": false,
+          "panels": []
+        },
+        {
+          "type": "stat",
+          "title": "URLs created (total)",
+          "description": "Cumulative count of successfully shortened URLs (url_shortener_urls_created_total).",
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "gridPos": { "h": 4, "w": 6, "x": 0, "y": 1 },
+          "id": 1,
+          "fieldConfig": {
+            "defaults": { "color": { "mode": "thresholds" }, "unit": "short", "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }] } },
+            "overrides": []
+          },
+          "options": { "colorMode": "value", "graphMode": "area", "justifyMode": "auto", "orientation": "auto", "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "textMode": "auto" },
+          "targets": [
+            { "refId": "A", "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "sum(increase(url_shortener_urls_created_total[$__range]))" }
+          ]
+        },
+        {
+          "type": "stat",
+          "title": "Redirects (total)",
+          "description": "Cumulative count of successful redirects (url_shortener_redirects_total).",
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "gridPos": { "h": 4, "w": 6, "x": 6, "y": 1 },
+          "id": 2,
+          "fieldConfig": {
+            "defaults": { "color": { "mode": "thresholds" }, "unit": "short", "thresholds": { "mode": "absolute", "steps": [{ "color": "blue", "value": null }] } },
+            "overrides": []
+          },
+          "options": { "colorMode": "value", "graphMode": "area", "justifyMode": "auto", "orientation": "auto", "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "textMode": "auto" },
+          "targets": [
+            { "refId": "A", "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "sum(increase(url_shortener_redirects_total[$__range]))" }
+          ]
+        },
+        {
+          "type": "stat",
+          "title": "Errors (total)",
+          "description": "Cumulative count of 4xx/5xx responses (url_shortener_errors_total).",
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "gridPos": { "h": 4, "w": 6, "x": 12, "y": 1 },
+          "id": 3,
+          "fieldConfig": {
+            "defaults": { "color": { "mode": "thresholds" }, "unit": "short", "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "red", "value": 1 }] } },
+            "overrides": []
+          },
+          "options": { "colorMode": "value", "graphMode": "area", "justifyMode": "auto", "orientation": "auto", "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "textMode": "auto" },
+          "targets": [
+            { "refId": "A", "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "sum(increase(url_shortener_errors_total[$__range]))" }
+          ]
+        },
+        {
+          "type": "stat",
+          "title": "Request rate (req/s)",
+          "description": "Total HTTP request rate across all routes (excludes /metrics, /health, /ready).",
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "gridPos": { "h": 4, "w": 6, "x": 18, "y": 1 },
+          "id": 4,
+          "fieldConfig": {
+            "defaults": { "color": { "mode": "thresholds" }, "unit": "reqps", "decimals": 2, "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }] } },
+            "overrides": []
+          },
+          "options": { "colorMode": "value", "graphMode": "area", "justifyMode": "auto", "orientation": "auto", "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "textMode": "auto" },
+          "targets": [
+            { "refId": "A", "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "sum(rate(http_requests_total[5m]))" }
+          ]
+        },
+        {
+          "type": "row",
+          "title": "HTTP traffic",
+          "gridPos": { "h": 1, "w": 24, "x": 0, "y": 5 },
+          "id": 101,
+          "collapsed": false,
+          "panels": []
+        },
+        {
+          "type": "timeseries",
+          "title": "Request rate by status",
+          "description": "Per-second HTTP request rate grouped by response status code.",
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "gridPos": { "h": 8, "w": 12, "x": 0, "y": 6 },
+          "id": 5,
+          "fieldConfig": {
+            "defaults": { "custom": { "drawStyle": "line", "fillOpacity": 15, "stacking": { "mode": "normal", "group": "A" } }, "unit": "reqps" },
+            "overrides": []
+          },
+          "options": { "legend": { "displayMode": "table", "placement": "bottom", "calcs": ["mean", "lastNotNull"] }, "tooltip": { "mode": "multi", "sort": "desc" } },
+          "targets": [
+            { "refId": "A", "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "sum by (status) (rate(http_requests_total[5m]))", "legendFormat": "{{status}}" }
+          ]
+        },
+        {
+          "type": "timeseries",
+          "title": "Request rate by route",
+          "description": "Per-second HTTP request rate grouped by matched route template.",
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "gridPos": { "h": 8, "w": 12, "x": 12, "y": 6 },
+          "id": 6,
+          "fieldConfig": {
+            "defaults": { "custom": { "drawStyle": "line", "fillOpacity": 15 }, "unit": "reqps" },
+            "overrides": []
+          },
+          "options": { "legend": { "displayMode": "table", "placement": "bottom", "calcs": ["mean", "lastNotNull"] }, "tooltip": { "mode": "multi", "sort": "desc" } },
+          "targets": [
+            { "refId": "A", "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "sum by (path) (rate(http_requests_total[5m]))", "legendFormat": "{{path}}" }
+          ]
+        },
+        {
+          "type": "timeseries",
+          "title": "Request latency (p50 / p95 / p99)",
+          "description": "Request duration quantiles derived from the http_request_duration_seconds histogram.",
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "gridPos": { "h": 8, "w": 12, "x": 0, "y": 14 },
+          "id": 7,
+          "fieldConfig": {
+            "defaults": { "custom": { "drawStyle": "line", "fillOpacity": 10 }, "unit": "s" },
+            "overrides": []
+          },
+          "options": { "legend": { "displayMode": "list", "placement": "bottom" }, "tooltip": { "mode": "multi", "sort": "desc" } },
+          "targets": [
+            { "refId": "A", "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "histogram_quantile(0.50, sum by (le) (rate(http_request_duration_seconds_bucket[5m])))", "legendFormat": "p50" },
+            { "refId": "B", "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "histogram_quantile(0.95, sum by (le) (rate(http_request_duration_seconds_bucket[5m])))", "legendFormat": "p95" },
+            { "refId": "C", "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "histogram_quantile(0.99, sum by (le) (rate(http_request_duration_seconds_bucket[5m])))", "legendFormat": "p99" }
+          ]
+        },
+        {
+          "type": "timeseries",
+          "title": "Error rate (%)",
+          "description": "Share of requests resulting in a 4xx/5xx response.",
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "gridPos": { "h": 8, "w": 12, "x": 12, "y": 14 },
+          "id": 8,
+          "fieldConfig": {
+            "defaults": { "custom": { "drawStyle": "line", "fillOpacity": 20, "gradientMode": "opacity" }, "unit": "percentunit", "min": 0, "color": { "mode": "fixed", "fixedColor": "red" } },
+            "overrides": []
+          },
+          "options": { "legend": { "displayMode": "list", "placement": "bottom" }, "tooltip": { "mode": "single" } },
+          "targets": [
+            { "refId": "A", "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "sum(rate(http_requests_total{status=~\"4..|5..\"}[5m])) / clamp_min(sum(rate(http_requests_total[5m])), 1)", "legendFormat": "error ratio" }
+          ]
+        },
+        {
+          "type": "row",
+          "title": "Business metrics",
+          "gridPos": { "h": 1, "w": 24, "x": 0, "y": 22 },
+          "id": 102,
+          "collapsed": false,
+          "panels": []
+        },
+        {
+          "type": "timeseries",
+          "title": "URLs created rate",
+          "description": "Per-second rate of new shortened URLs.",
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "gridPos": { "h": 8, "w": 12, "x": 0, "y": 23 },
+          "id": 9,
+          "fieldConfig": {
+            "defaults": { "custom": { "drawStyle": "line", "fillOpacity": 15 }, "unit": "cps", "color": { "mode": "fixed", "fixedColor": "green" } },
+            "overrides": []
+          },
+          "options": { "legend": { "displayMode": "list", "placement": "bottom" }, "tooltip": { "mode": "single" } },
+          "targets": [
+            { "refId": "A", "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "sum(rate(url_shortener_urls_created_total[5m]))", "legendFormat": "urls created/s" }
+          ]
+        },
+        {
+          "type": "timeseries",
+          "title": "Redirects rate",
+          "description": "Per-second rate of successful redirects.",
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "gridPos": { "h": 8, "w": 12, "x": 12, "y": 23 },
+          "id": 10,
+          "fieldConfig": {
+            "defaults": { "custom": { "drawStyle": "line", "fillOpacity": 15 }, "unit": "cps", "color": { "mode": "fixed", "fixedColor": "blue" } },
+            "overrides": []
+          },
+          "options": { "legend": { "displayMode": "list", "placement": "bottom" }, "tooltip": { "mode": "single" } },
+          "targets": [
+            { "refId": "A", "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "sum(rate(url_shortener_redirects_total[5m]))", "legendFormat": "redirects/s" }
+          ]
+        }
+      ]
+    }
